@@ -1,0 +1,26 @@
+{
+  "files": {
+    "example_converted.csv": [
+      {
+        "id": "d2eb87d5-d38e-4d28-92ce-575a341aa37a",
+        "line": 3,
+        "version": 1,
+        "index": 42
+      }
+    ],
+    "main.py": [
+      {
+        "id": "916f0618-a163-4012-b75f-3f97859e1734",
+        "line": 4,
+        "version": 2870,
+        "index": 55
+      },
+      {
+        "id": "4fc1e3e1-0887-438f-9be2-c368e05877c2",
+        "line": 107,
+        "version": 2870,
+        "index": 2190
+      }
+    ]
+  }
+}
