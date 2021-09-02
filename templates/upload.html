@@ -1,0 +1,29 @@
+<!-- <!doctype html>
+<html>
+<head>
+<title>Upload new File</title>
+</head>
+<body> -->
+{% extends "layout.html" %}
+
+{% block title %}Get the ringtone{% endblock %}
+
+{% block content %}
+    <h1>Upload new File</h1>
+        <form method="POST" enctype=multipart/form-data>
+            <input type="file" name="file">
+            <input type="submit" value="Upload">
+        </form>
+    <h2>Download Ringtone</h2>
+
+        <ul>
+
+            <li><a href= "/midi_csv" >Get remixed ringtone of song</a></li>
+  
+        </ul>
+      <img src="https://thumbs.gfycat.com/MarvelousHollowHoneyeater-max-1mb.gif">
+
+{% endblock %}
+
+<!-- </body>
+</html> -->

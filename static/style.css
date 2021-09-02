@@ -1,4 +1,15 @@
-body {
-    background-color: #eef;
-    color: black;
+body {    
+    color: rgb(185, 24, 24);
+   
+   
+} 
+html { 
+  background: url('https://i.pinimg.com/originals/ff/62/08/ff620854b85ca2824e8e3b6b3e5d079e.gif') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
+
+
+   

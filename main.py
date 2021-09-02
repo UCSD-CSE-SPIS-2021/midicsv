@@ -5,10 +5,12 @@ import random
 import requests
 
 
-
+from werkzeug.utils import secure_filename
 import os
-from flask import Flask, url_for, render_template, request
+from flask import Flask, flash, request, redirect, url_for, render_template, send_from_directory, send_file
 
+
+global_file = None
 app = Flask(__name__)
 
 @app.route('/')
@@ -16,12 +18,53 @@ def render_main():
 
     return render_template('home.html')
 
-def download_link():
-    url = 'https://www.facebook.com/favicon.ico'#replace with var from template using request.args[]
-    r = requests.get(url, allow_redirects=True)
+print(os.path.dirname(os.path.abspath(__file__)))
 
-    open('facebook.ico', 'wb').write(r.content)#replace with var from template
-download_link()
+
+UPLOAD_FOLDER = '/home/runner/midicsv/templates/user_uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 25*1000*1000
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mid'}
+
+@app.route('/uploads/<name>')
+def download_file(name):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], name)
+
+app.add_url_rule(
+    "/uploads/<name>", endpoint="download_file", build_only=True
+)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        print ("LINE 19")
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            print ("LINE 29")
+            filename = secure_filename(file.filename)
+            global global_file
+            global_file = filename
+            
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('download_file', name=filename))
+    
+    return render_template('upload.html')
+
+
+
 
 
 @app.route('/midi_csv')
@@ -32,7 +75,7 @@ def render_midi_csv():
 
         midi_csv()
 
-        return render_template('midi_csv.html')
+        return send_file("ringtone.mid", as_attachment = True)
 
     except ValueError:
 
@@ -40,17 +83,18 @@ def render_midi_csv():
 
     #return render_template('midi_csv.html')
 
-@app.route('/download_csv')
-def render_download():
-    try:
-        download_link()
+
+
+
         
 
 def midi_csv():
 # Load the MIDI file and parse it into CSV format
     #call download_link()
-    csv_string = pm.midi_to_csv("ShapeofYou.mid")
-
+    print(global_file)
+    #name_file_without_ext = global_file.rsplit('.', 1)[0]
+    csv_string = pm.midi_to_csv("./templates/user_uploads/"+ global_file)
+    
     notes_list = []
 
     with open("example_converted.csv", "w") as f:
@@ -108,7 +152,7 @@ def midi_csv():
         j+=1
     #print(markov_new_notes)
 
-    csv_string1 = pm.midi_to_csv("ShapeofYou.mid")
+    csv_string1 = pm.midi_to_csv("./templates/user_uploads/" +global_file)
     with open("example_converted1.csv", "w") as f:
         f.writelines(csv_string1)
 
@@ -144,27 +188,15 @@ def midi_csv():
         z.close()
 
 
-
-
-            
-
-
-
-
-
-
-
-
-
-
     # Parse the CSV output of the previous command back into a MIDI file
     midi_object = pm.csv_to_midi("example_converted1.csv")
 
     # Save the parsed MIDI file to disk
-    with open("ShapeofYou_ringtone1.mid", "wb") as output_file:
+    with open("ringtone.mid", "wb") as output_file:
         midi_writer = pm.FileWriter(output_file)
         midi_writer.write(midi_object)
 
+    
 if __name__ == "__main__":
 
    app.run(host='0.0.0.0', debug=True)
